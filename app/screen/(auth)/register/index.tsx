@@ -86,20 +86,8 @@ export default function RegisterScreen() {
     return isValid;
   };
 
-  // const handleRegister = () => {
-  //   if (validateForm()) {
-  //     console.log("Registration successful! Data:", { name, email, password });
-  //   } else {
-  //     console.log("Validation failed. Cannot register.");
-  //   }
-  // };
-
-
-
 const handleRegister = async () => {
-
   if (!validateForm()) return;
-
   try {
     const payload = {
       fullName: name,
@@ -115,17 +103,13 @@ const handleRegister = async () => {
       },
       body: JSON.stringify(payload)
     });
-
     const data = await response.json();
-
     if (!response.ok) {
       alert(data.message || "Registration failed");
       return;
     }
-
     alert("Registration successful");
     console.log("TOKEN:", data.token);
-
   } catch (err) {
     console.error(err);
     alert("Server error");

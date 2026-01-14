@@ -1,3 +1,4 @@
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   Alert,
@@ -15,11 +16,11 @@ import {
 const CODE_LENGTH = 6;
 
 export default function VerifyCodeScreen() {
+  const { email } = useLocalSearchParams<{ email: string }>();
   const [code, setCode] = useState<string[]>(
     Array(CODE_LENGTH).fill("")
   );
   const [isPressed, setIsPressed] = useState<boolean>(false);
-
   const inputs = useRef<Array<TextInput | null>>([]);
 
   const handleChange = (text: string, index: number): void => {
@@ -32,15 +33,57 @@ export default function VerifyCodeScreen() {
     }
   };
 
-  const handleVerify = (): void => {
-    const otp = code.join("");
-    if (otp.length < CODE_LENGTH) {
-      Alert.alert("Error", "Please enter the complete code");
+const handleVerify = async (): Promise<void> => {
+  const otp = code.join(""); 
+
+  if (otp.length < CODE_LENGTH) {
+    Alert.alert("Error", "Please enter the complete code");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/auth/verifyotp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,    
+          codeDigits: code, 
+        }),
+      }
+    );
+
+    const result = await response.json();
+    if (!response.ok) {
+      Alert.alert("Error", result.message || "OTP verification failed");
       return;
     }
-    Alert.alert("Success", "Code verified successfully");
-    console.log("Entered OTP:", otp);
-  };
+    Alert.alert("Success", result.message);
+    console.log("Verified Email Token:", result.data.email);
+     router.push({
+       pathname: "../newpass",
+       params: { email: result.data.email },
+     });
+
+  } catch (error) {
+    console.error("Verify OTP error:", error);
+    Alert.alert("Error", "Unable to connect to server");
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
 
   const handleKeyPress = (
   e: any,

@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -13,27 +14,50 @@ import {
 } from "react-native";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const [isPressed, setIsPressed] = useState(false);
   const [emailError, setEmailError] = useState("");
 
-  const handleSend = () => {
-    setEmailError("");
-
-    if (!email.trim()) {
-      setEmailError("Email is required");
+const handleSend = async () => {
+  setEmailError("");
+  if (!email.trim()) {
+    setEmailError("Email is required");
+    return;
+  }
+  if (!EMAIL_REGEX.test(email.trim())) {
+    setEmailError("Enter a valid email");
+    return;
+  }
+  try {
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/auth/forgetpassword`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+        }),
+      }
+    );
+    const result = await response.json();
+    if (!response.ok) {
+      Alert.alert("Error", result.message || "Something went wrong");
       return;
     }
-    if (!EMAIL_REGEX.test(email.trim())) {
-      setEmailError("Enter a valid email");
-      return;
-    }
-
-    Alert.alert("Success", "Password reset link sent to your email");
-    console.log("Forgot password email:", email);
-  };
+    Alert.alert("Success", result.message);
+    console.log("Encrypted Email:", result.data.email);
+    router.push({
+      pathname: "../(auth)/verifycode",       
+      params: { email: result.data.email },
+    });
+  } catch (error) {
+    console.error("Forget password error:", error);
+    Alert.alert("Error", "Unable to connect to server");
+  }
+};
 
   return (
     <KeyboardAvoidingView
