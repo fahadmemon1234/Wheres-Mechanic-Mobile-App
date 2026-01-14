@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
 } from "react-native";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -116,10 +116,10 @@ const styles = StyleSheet.create({
     marginTop: -100,
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 200,
+    height: 200,
     resizeMode: "contain",
-    marginBottom: -40,
+    marginBottom: -50,
   },
   title: {
     fontSize: 28,

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import LoginScreen from "../screen/(auth)/login";
+import VerifyCodeScreen from "../screen/(auth)/verifycode";
 import SplashScreen from "../screen/splashscreen";
 
 export default function HomeScreen() {
   const [isSplashDone, setIsSplashDone] = useState(false);
   return isSplashDone ? (
-    <LoginScreen />
+    <VerifyCodeScreen />
   ) : (
     <SplashScreen onSplashDone={() => setIsSplashDone(true)} />
   );
