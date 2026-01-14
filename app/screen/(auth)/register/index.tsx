@@ -65,12 +65,14 @@ export default function RegisterScreen() {
     else if (!password) {
       setPasswordError("Password is required.");
       isValid = false;
-    } else if (!PASSWORD_REGEX.test(password)) {
-      setPasswordError(
-        "Min 8 chars, 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char."
-      );
-      isValid = false;
-    }
+    } 
+    
+    // else if (!PASSWORD_REGEX.test(password)) {
+    //   setPasswordError(
+    //     "Min 8 chars, 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char."
+    //   );
+    //   isValid = false;
+    // }
 
   
     else if (!confirmPassword) {
@@ -84,13 +86,58 @@ export default function RegisterScreen() {
     return isValid;
   };
 
-  const handleRegister = () => {
-    if (validateForm()) {
-      console.log("Registration successful! Data:", { name, email, password });
-    } else {
-      console.log("Validation failed. Cannot register.");
+  // const handleRegister = () => {
+  //   if (validateForm()) {
+  //     console.log("Registration successful! Data:", { name, email, password });
+  //   } else {
+  //     console.log("Validation failed. Cannot register.");
+  //   }
+  // };
+
+
+
+const handleRegister = async () => {
+
+  if (!validateForm()) return;
+
+  try {
+    const payload = {
+      fullName: name,
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword
+    };
+
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Registration failed");
+      return;
     }
-  };
+
+    alert("Registration successful");
+    console.log("TOKEN:", data.token);
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+};
+
+
+
+
+
+
+
 
   const handleNavigateToLogin = () => {
     router.push("/screen/(auth)/login");
