@@ -15,54 +15,15 @@ import {
   View,
 } from "react-native";
 
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-
- 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
-  // const handleLogin = () => {
-    
-  //   setEmailError("");
-  //   setPasswordError("");
-
-  //   let isValid = true;
-
-
-  //   if (!email.trim()) {
-  //     setEmailError("Email is required.");
-  //     isValid = false;
-  //   } else if (!EMAIL_REGEX.test(email.trim())) {
-  //     setEmailError("Please enter a valid email address.");
-  //     isValid = false;
-  //   }
-  //   else if (!password) {
-  //     setPasswordError("Password is required.");
-  //     isValid = false;
-  //   } else if (password.length < 6) {
-  //     setPasswordError("Password must be at least 6 characters.");
-  //     isValid = false;
-  //   }
-
-  //   if (isValid) {
-
-
-
-  //     console.log("Login successful! Data:", { email, password, rememberMe });
-     
-  //   }
-  // };
-
-  // var API_BASE_URL = 'https://localhost:7276';
-
 
 const handleLogin = async () => {
   setEmailError("");
@@ -113,7 +74,7 @@ debugger;
 
     console.log("TOKEN:", result.token);
 
-    router.replace("/screen/HomeScreen");
+    router.push("/screen/HomeScreen");
 
   } catch (error) {
     console.error(error);
@@ -121,16 +82,8 @@ debugger;
   }
 };
 
-
-
-
-
-
-
-
   const handleGoogleLogin = () => console.log("Google login");
   const handleFacebookLogin = () => console.log("Facebook login");
-
   const handleNavigateToRegister = () => {
     router.push("/screen/(auth)/register");
   };

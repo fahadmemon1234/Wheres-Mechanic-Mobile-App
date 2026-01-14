@@ -1,49 +1,85 @@
 import { FontAwesome } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function NewPasswordScreen() {
+  const { email } = useLocalSearchParams<{ email: string }>();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPressed, setIsPressed] = useState(false);
   const [error, setError] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleReset = () => {
-    setError("");
-
-    if (!password || !confirmPassword) {
-      setError("Both fields are required");
-      return;
+const handleReset = async () => {
+  setError("");
+  if (!password || !confirmPassword) {
+    setError("Both fields are required");
+    return;
+  }
+  if (password.length < 6) {
+    setError("Password must be at least 6 characters");
+    return;
+  }
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    return;
+  }
+  try {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/auth/NewPass`,
+      {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Password: password,
+        ConfirmPassword: confirmPassword,
+        Email: email, 
+      }),
+    });
+    const data = await response.json();
+    if (data.status === true) {
+    Alert.alert("Success", data.message);
+       router.push({
+            pathname: "../(auth)/login",       
+          });
+    } else {
+      setError(data.Message || "Failed to reset password");
     }
+  } catch (err) {
+    console.error(err);
+    setError("Something went wrong. Please try again.");
+  }
+};
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
 
-    Alert.alert("Success", "Password reset successfully");
-    console.log("New password:", password);
-  };
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <KeyboardAvoidingView
