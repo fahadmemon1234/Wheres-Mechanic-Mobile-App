@@ -1,11 +1,17 @@
+import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 
 export default function SplashScreen({ onSplashDone }: { onSplashDone: () => void }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
-
+  const router = useRouter();
+  
   useEffect(() => {
+      setTimeout(() => {
+      router.replace('/screen/(auth)/login');
+    }, 2000);
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
