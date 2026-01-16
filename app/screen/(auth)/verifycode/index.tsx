@@ -1,25 +1,25 @@
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Image,
   KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+  Platform, Pressable, ScrollView,
+  StyleSheet, Text, TextInput,
+  View
 } from "react-native";
 
 const CODE_LENGTH = 6;
 
 export default function VerifyCodeScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
+  const [error, setError] = useState("");
+  const [seconds, setSeconds] = useState(30);
+  const [canResend, setCanResend] = useState(false);
   const [code, setCode] = useState<string[]>(
     Array(CODE_LENGTH).fill("")
   );
+ 
   const [isPressed, setIsPressed] = useState<boolean>(false);
   const inputs = useRef<Array<TextInput | null>>([]);
 
@@ -32,8 +32,106 @@ export default function VerifyCodeScreen() {
       inputs.current[index + 1]?.focus();
     }
   };
+ // 🔁 Countdown Timer
+  // useEffect(() => {
+  //   if (seconds === 0) {
+  //     setCanResend(true);
+  //     return;
+  //   }
 
-const handleVerify = async (): Promise<void> => {
+  //   const timer = setInterval(() => {
+  //     setSeconds((prev) => prev - 1);
+  //   }, 1000);
+
+  //   return () => clearInterval(timer);
+  // }, [seconds]);
+
+const timerRef = useRef<any>(null);
+
+ const startTimer = (duration: number) => {
+    setSeconds(duration);
+    setCanResend(false);
+
+    // clear existing timer
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          setCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  // start timer on mount
+  useEffect(() => {
+    startTimer(30);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+
+
+
+
+
+
+
+
+const handleResendOTPAgain = async () => {
+    if (!canResend) return;
+
+    try {
+      setError("");
+
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_BASE_URL}/ResendOTP`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            Email: email, // 🔐 encrypted email token
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Resend OTP:", data);
+
+      if (data.success === true) {
+        Alert.alert("Success", data.message);
+
+        // 🔄 Reset timer
+        //setSeconds(30);
+        //setCanResend(false);
+        startTimer(30);
+      } else {
+        setError(data.message || "Failed to resend OTP");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+  const handleVerify = async (): Promise<void> => {
   const otp = code.join(""); 
 
   if (otp.length < CODE_LENGTH) {
@@ -73,17 +171,6 @@ const handleVerify = async (): Promise<void> => {
     Alert.alert("Error", "Unable to connect to server");
   }
 };
-
-
-
-
-
-
-
-
-
-
-
 
   const handleKeyPress = (
   e: any,
@@ -158,10 +245,26 @@ const handleVerify = async (): Promise<void> => {
               </Text>
             </Pressable>
 
-            <Text style={styles.resendText}>
+            {/* <Text style={styles.resendText}>
               Didn’t receive code?
-              <Text style={styles.resendLink}> Request again</Text>
-            </Text>
+              <Pressable onPress={handleResendOTPAgain}>
+                <Text style={styles.resendLink}>Request again</Text>
+              </Pressable>
+            </Text> */}
+            <View style={styles.resendContainer}>
+              <Text style={styles.resendText}>Didn’t receive code?</Text>
+
+              {canResend ? (
+                <Pressable onPress={handleResendOTPAgain}>
+                  <Text style={styles.resendLink}>Request again</Text>
+                </Pressable>
+              ) : (
+                <Text style={styles.timerText}>
+                  Request again in {seconds}s
+                </Text>
+              )}
+            </View>
+
           </View>
         </View>
       </ScrollView>
@@ -251,5 +354,19 @@ const styles = StyleSheet.create({
     color: "#e2002b",
     fontWeight: "bold",
   },
+
+
+
+resendContainer: {
+  flexDirection: "row",
+  alignItems: "baseline",
+  marginTop: 15,
+  gap: 6,
+},
+timerText: {
+  fontSize: 15,
+  color: "#080404",
+},
+
 });
 
