@@ -1,14 +1,17 @@
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { DrawerActions } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Tabs, useNavigation } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { Tabs } from 'expo-router';
 import React from 'react';
 import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+
+
 
 const { width } = Dimensions.get('window');
 
 export default function TabLayout() {
-  const navigation = useNavigation();
+
+const navigation = useNavigation();
 
   return (
     <Tabs
@@ -17,15 +20,15 @@ export default function TabLayout() {
         headerTransparent: true,
         headerTitle: "",
         headerLeft: () => (
-          <TouchableOpacity 
-            onPress={() => navigation.dispatch(DrawerActions.openDrawer())} 
+         <TouchableOpacity
+           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             style={styles.menuButton}
             activeOpacity={0.7}
           >
             <View style={styles.burgerIcon}>
-               <View style={styles.line} />
-               <View style={[styles.line, { width: 15 }]} />
-               <View style={styles.line} />
+              <View style={styles.line} />
+              <View style={[styles.line, { width: 15 }]} />
+              <View style={styles.line} />
             </View>
           </TouchableOpacity>
         ),
@@ -39,12 +42,13 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <View style={styles.tabItem}>
               <Feather name="grid" size={20} color={focused ? '#1B4332' : '#94A3B8'} />
-              <Text style={[styles.navLabel, { color: focused ? '#1B4332' : '#94A3B8' }]}>Home</Text>
+              <Text style={[styles.navLabel, { color: focused ? '#1B4332' : '#94A3B8' }]}>Dashboard</Text>
             </View>
           ),
         }}
       />
 
+    
       <Tabs.Screen
         name="explore"
         options={{
@@ -57,51 +61,13 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="orders"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <View style={styles.centerTabContainer}>
-              <LinearGradient 
-                colors={focused ? ['#1B4332', '#40916C'] : ['#E9F5EF', '#E9F5EF']} 
-                style={styles.centerIconBg}
-              >
-                <MaterialCommunityIcons 
-                  name="wrench" 
-                  size={22} 
-                  color={focused ? "#FFF" : "#1B4332"} 
-                />
-              </LinearGradient>
-              <Text style={[styles.navLabel, { color: focused ? '#1B4332' : '#94A3B8', marginTop: 8 }]}>Jobs</Text>
-            </View>
-          ),
-        }}
+      
+  <Tabs.Screen
+        name="services"
+        options={{ title: 'Services' }}
       />
-
-      <Tabs.Screen
-        name="wallet"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <View style={styles.tabItem}>
-              <Ionicons name="wallet-outline" size={20} color={focused ? '#1B4332' : '#94A3B8'} />
-              <Text style={[styles.navLabel, { color: focused ? '#1B4332' : '#94A3B8' }]}>Wallet</Text>
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <View style={styles.tabItem}>
-              <Ionicons name="person-outline" size={20} color={focused ? '#1B4332' : '#94A3B8'} />
-              <Text style={[styles.navLabel, { color: focused ? '#1B4332' : '#94A3B8' }]}>Profile</Text>
-            </View>
-          ),
-        }}
-      />
-    </Tabs>
+    
+     </Tabs>
   );
 }
 

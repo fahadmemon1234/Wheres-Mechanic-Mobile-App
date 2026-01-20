@@ -74,7 +74,7 @@ debugger;
 
     console.log("TOKEN:", result.token);
 
-    router.push("/(tabs)/home");
+    router.push("/(drawer)/(tabs)/home");
 
   } catch (error) {
     console.error(error);

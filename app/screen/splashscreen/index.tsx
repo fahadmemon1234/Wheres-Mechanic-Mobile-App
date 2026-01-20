@@ -9,7 +9,7 @@ export default function SplashScreen({ onSplashDone }: { onSplashDone: () => voi
   
   useEffect(() => {
       setTimeout(() => {
-      router.replace('/screen/(auth)/login');
+      router.replace("/screen/(auth)/login");
     }, 2000);
 
     Animated.parallel([
